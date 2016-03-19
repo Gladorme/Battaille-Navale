@@ -1,7 +1,7 @@
 from tkinter import *
 fen = Tk()
 fen.geometry("1400x800")
-fen.title("Solo")
+fen.title("Solo - Bataille Navale")
 
 #Réglages:
 d=50
@@ -19,7 +19,7 @@ for n in range(100):
     can1.itemconfig(tuile1[n], fill="orange")
     val1 = val1 + [can1.create_text(x+d//2, y+d//2)]
     can1.itemconfig(val1[n], text = n)
-##Indication et palacement des indications
+##Indication et placement des indications
 label1x = Label(text="  A     B     C     D     E     F    G     H     I      J", font=("Helvetica", 18))
 label1x.place(x=100,y=110)
 label1y1 = Label(text="1",font=("Helvetica", 18))
@@ -57,7 +57,7 @@ for n in range(100):
     val2 = val2 + [can2.create_text(x+d//2, y+d//2)]
     can2.itemconfig(val2[n], text = n)
 
-##Indication et palacement des indications
+##Indication et placement des indications
 label2x = Label(text="  A     B     C     D     E     F    G     H     I      J", font=("Helvetica", 18))
 label2x.place(x=700,y=110) 
 label2y1 = Label(text="1",font=("Helvetica", 18))
