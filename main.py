@@ -7,15 +7,126 @@ fen.title("Bataille Navale")
 #-----------------------#
 # Début: Variables      #
 #-----------------------#
-cases_occupées=[]
+cases_occupées_bot=[]
+cases_occupées_joueur=[]
+état = "initial"
+label_info_desc = Label(fen, text="Placement du bot")
+c=0
+b=0
 #-----------------------#
 # Fin: Variables        #
 #-----------------------#
+def getCase(x,y):
+    x=int(x/50)
+    y=int(y/50)
+    if y == 0:
+        case = x
+    else:
+        case=int(str(y)+str(x))
+    return case
+def placement(b,case,impossible,position):
+    global cases_occupées_joueur,can1,tuile1,c
+    b=c
+    if b == 0:
+        used=[]
+        used.extend(cases_occupées_joueur)
+        used.extend(impossible)
+        if position == 0 and ((case) or (case+1) or (case+2) or (case+3) or (case+4)) not in used:
+            cases_occupées_joueur.extend([case,(case+1),(case+2),(case+3),(case+4)])
+            can1.itemconfig((tuile1[case]), fill="red")
+            can1.itemconfig((tuile1[case]+2), fill="red")
+            can1.itemconfig((tuile1[case]+4), fill="red")
+            can1.itemconfig((tuile1[case]+6), fill="red")
+            can1.itemconfig((tuile1[case]+8), fill="red")
+            c=1
+        elif position == 1 and ((case) or (case+10) or (case+20) or (case+30) or (case+40)) not in used:
+            can1.itemconfig((tuile1[case]), fill="red")
+            can1.itemconfig((tuile1[case]+20), fill="red")
+            can1.itemconfig((tuile1[case]+40), fill="red")
+            can1.itemconfig((tuile1[case]+60), fill="red")
+            can1.itemconfig((tuile1[case]+80), fill="red")
+            cases_occupées_joueur.extend([case,(case+10),(case+20),(case+30),(case+40)])
+            c=1
+    if b == 1:
+        used=[]
+        used.extend(cases_occupées_joueur)
+        used.extend(impossible)
+        if position == 0 and ((case) or (case+1) or (case+2) or (case+3)) not in used:
+            cases_occupées_joueur.extend([case,(case+1),(case+2),(case+3)])
+            can1.itemconfig((tuile1[case]), fill="yellow")
+            can1.itemconfig((tuile1[case]+2), fill="yellow")
+            can1.itemconfig((tuile1[case]+4), fill="yellow")
+            can1.itemconfig((tuile1[case]+6), fill="yellow")
+            c=2
+        elif position == 1 and ((case) or (case+10) or (case+20) or (case+30)) not in used:
+            cases_occupées_joueur.extend([case,(case+10),(case+20),(case+30)])
+            can1.itemconfig((tuile1[case]), fill="yellow")
+            can1.itemconfig((tuile1[case]+20), fill="yellow")
+            can1.itemconfig((tuile1[case]+40), fill="yellow")
+            can1.itemconfig((tuile1[case]+60), fill="yellow")
+            c=2
+    if b == 2 or b == 3:
+        used=[]
+        used.extend(cases_occupées_joueur)
+        used.extend(impossible)
+        if position == 0 and ((case) or (case+1) or (case+2)) not in used:
+            cases_occupées_joueur.extend([case,(case+1),(case+2)])
+            can1.itemconfig((tuile1[case]), fill="blue")
+            can1.itemconfig((tuile1[case]+2), fill="blue")
+            can1.itemconfig((tuile1[case]+4), fill="blue")
+            c=c+1
+        elif position == 1 and ((case) or (case+10) or (case+20)) not in used:
+            cases_occupées_joueur.extend([case,(case+10),(case+20)])
+            can1.itemconfig((tuile1[case]), fill="blue")
+            can1.itemconfig((tuile1[case]+20), fill="blue")
+            can1.itemconfig((tuile1[case]+40), fill="blue")
+            c=c+1
+    if b == 4:
+        used=[]
+        used.extend(cases_occupées_joueur)
+        used.extend(impossible)
+        if position == 0 and ((case) or (case+1)) not in used:
+            cases_occupées_joueur.extend([case,(case+1)])
+            can1.itemconfig((tuile1[case]), fill="black")
+            can1.itemconfig((tuile1[case]+2), fill="black")
+            c=5
+        elif position == 1 and ((case) or (case+10)) not in used:
+            cases_occupées_joueur.extend([case,(case+10)])
+            can1.itemconfig((tuile1[case]), fill="black")
+            can1.itemconfig((tuile1[case]+20), fill="black")
+            c=5
+
+def callback1(event):
+    global état,b
+    print ("Can1: ", str(event.x), str(event.y))
+    if état == "placement_joueur":
+        label_info_desc.config(text="Placement joueur")
+        if b == 0:
+            label_info_desc.config(text="Veuillez placer le porte-avion (5 cases)")
+            impossible=[9,19,29,39,49,59,69,79,89,99,8,18,28,38,48,58,68,78,88,98,7,17,27,37,47,57,67,77,87,97,6,16,26,36,46,56,66,76,86,96]
+            placement(b,(getCase((event.x),(event.y))),impossible,0)              
+        if b == 1:
+            label_info_desc.config(text="Veuillez placer le croiseur (4 cases)")
+            impossible=[9,19,29,39,49,59,69,79,89,99,8,18,28,38,48,58,68,78,88,98,7,17,27,37,47,57,67,77,87,97]
+            placement(b,(getCase((event.x),(event.y))),impossible,0) 
+        if b == 2 or b == 3:
+            label_info_desc.config(text="Veuillez placer le contre-torpilleur (3 cases)")
+            impossible=[9,19,29,39,49,59,69,79,89,99,8,18,28,38,48,58,68,78,88,98]
+            placement(b,(getCase((event.x),(event.y))),impossible,0) 
+        if b == 4:
+            label_info_desc.config(text="Veuillez placer le torpilleur (2 cases)")
+            impossible=[9,19,29,39,49,59,69,79,89,99]
+            placement(b,(getCase((event.x),(event.y))),impossible,0) 
+def callback2(event):
+    global état
+    print ("Can2: ", str(event.x), str(event.y))
+
 
 #-----------------------#
 # Début: Jeu            #
 #-----------------------#
 def jouer():
+    global état,can1,can2,tuile1,tuile2
     #Suppression des éléments présent dans le menu d'accueil
     can_menu.config(width=0, heigh=0)
     jouer_button.destroy()
@@ -32,6 +143,7 @@ def jouer():
 		
     #Partie 1:
     can1 = Canvas(fen, width= colonne*d, height= colonne*d)
+    can1.bind("<Button-1>", callback1)
     can1.place(x=100,y=150)
     tuile1 = []
     val1 = []
@@ -70,6 +182,7 @@ def jouer():
 		
     #Partie 2:
     can2 = Canvas(fen, width= colonne*d, height= colonne*d)
+    can2.bind("<Button-1>", callback2)
     can2.place(x=700,y=150)
     tuile2 = []
     val2 = []
@@ -106,7 +219,6 @@ def jouer():
     label2y10.place(x=660,y=610)
     
     label_info = Label(fen, text="Informations:")
-    label_info_desc = Label(fen, text="Placement du bot")
     label_info.place(x=600,y=675)
     label_info_desc.place(x=600,y=700)
     #------------------------------#
@@ -117,68 +229,69 @@ def jouer():
     #------------------------------#
     #Permet le placement aléatoire du bloc de "base"
     def random(k,position,impossible):
-        global cases_occupées
+        global cases_occupées_bot
         if k == 0:
             used=[]
-            used.extend(cases_occupées)
+            used.extend(cases_occupées_bot)
             used.extend(impossible)
             if position == 0:
                 case = randint(0,95)
                 while ((case) or (case+1) or (case+2) or (case+3) or (case+4)) in used:
                     case = randint(0,95)
-                cases_occupées.extend([case,(case+1),(case+2),(case+3),(case+4)])
+                cases_occupées_bot.extend([case,(case+1),(case+2),(case+3),(case+4)])
             else:
                 case = randint(0,59)
                 while ((case) or (case+10) or (case+20) or (case+30) or int(case+40)) in used:
                     case = randint(0,59)
-                cases_occupées.extend([case,(case+10),(case+20),(case+30),(case+40)])
+                cases_occupées_bot.extend([case,(case+10),(case+20),(case+30),(case+40)])
         if k == 1:
             used=[]
-            used.extend(cases_occupées)
+            used.extend(cases_occupées_bot)
             used.extend(impossible)
             if position == 0:
                 case = randint(0,96)
                 while ((case) or (case+1) or (case+2) or (case+3)) in used:
                     case = randint(0,96)
-                cases_occupées.extend([case,(case+1),(case+2),(case+3)])
+                cases_occupées_bot.extend([case,(case+1),(case+2),(case+3)])
             else:
                 case = randint(0,69)
                 while ((case) or (case+10) or (case+20) or (case+30)) in used:
                     case = randint(0,69)
-                cases_occupées.extend([case,(case+10),(case+20),(case+30)])
+                cases_occupées_bot.extend([case,(case+10),(case+20),(case+30)])
         if k == 2 or k == 3:
             used=[]
-            used.extend(cases_occupées)
+            used.extend(cases_occupées_bot)
             used.extend(impossible)
             if position == 0:
                 case = randint(0,97)
                 while ((case) or (case+1) or (case+2)) in used:
                     case = randint(0,97)
-                cases_occupées.extend([case,(case+1),(case+2)])
+                cases_occupées_bot.extend([case,(case+1),(case+2)])
             else:
                 case = randint(0,79)
                 while ((case) or (case+10) or (case+20)) in used:
                     case = randint(0,79)
-                cases_occupées.extend([case,(case+10),(case+20)])
+                cases_occupées_bot.extend([case,(case+10),(case+20)])
         if k == 4:
             used=[]
-            used.extend(cases_occupées)
+            used.extend(cases_occupées_bot)
             used.extend(impossible)
             if position == 0:
                 case = randint(0,98)
                 while ((case) or (case+10)) in used:
                     case = randint(0,98)
-                cases_occupées.extend([case,(case+1)])
+                cases_occupées_bot.extend([case,(case+1)])
             else:
                 case = randint(0,89)
                 while ((case) or (case+10)) in used:
                     case = randint(0,89)
-                cases_occupées.extend([case,(case+10)])
+                cases_occupées_bot.extend([case,(case+10)])
         return case
                 
             
     ##Placement de l'AI
     #var position: si position=0 alors le navire sera horizontal sinon si position=1 alors le bateau sera vertical
+    état = "placement_bot"
     for k in range(0,5):
         if k == 0:
             position=randint(0,1)
@@ -244,6 +357,7 @@ def jouer():
             else:
                 can2.itemconfig(tuile2[case], fill="black")
                 can2.itemconfig((tuile2[case]+20), fill="black")
+        """
         #------------------------------#
         # Début: Vérification bot      #
         #------------------------------# 
@@ -254,6 +368,7 @@ def jouer():
         #------------------------------#
         # Fin: Vérification bot        #
         #------------------------------# 
+        """
     #------------------------------#
     # Fin: Placement du bot        #
     #------------------------------#
@@ -262,6 +377,9 @@ def jouer():
     # Début: Placement joueur      #
     #------------------------------#
     #Initialisation
+    état = "placement_joueur"
+    label_info_desc.config(text="Veuillez placer le porte-avion (5 cases)")
+    label_info.config(text="Clique gauche pour que le bateau soit horizontal et clique droit pour qu'il soit vertical")
     """
     label_info_desc.config(text="Placement joueur")
     k=0
