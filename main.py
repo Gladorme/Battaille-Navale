@@ -14,6 +14,8 @@ cases_tirées_bot=[]
 état = "initial"
 label_info_desc = Label(fen, text="Placement du bot")
 label_info = Label(fen, text="Informations:")
+bateaux_bot = []
+bateaux_joueur = []
 b=0
 #-----------------------#
 # Fin: Variables        #
@@ -28,44 +30,53 @@ def getCase(x,y):
     return case
     
 def check():
-    global état, cases_occupées_joueur, cases_occupées_bot, cases_tirées_joueur, cases_tirées_bot
-    if len(cases_tirées_joueur) == len(set(cases_occupées_bot)):
+    global état, bateaux_bot, bateaux_joueur
+    if bateaux_bot == []:
         label_info_desc.config(text="Vous avez gagné !")
         état = "victoire"
-    if len(cases_tirées_bot) == len(set(cases_occupées_joueur)):
+    if bateaux_joueur == []:
         label_info_desc.config(text="Vous avez perdu !")
         état = "défaite"
         
 def tirer_bot():
-    global état,can1,tuile1
+    global état,can1,tuile1,cases_tirées_bot,cases_occupées_joueur, bateaux_joueur
     case=randint(0,99)
-    if case not in cases_tirées_bot:
+    if  état == "jouer_bot" and (case not in cases_tirées_bot):
         if case in cases_occupées_joueur:
             can1.itemconfig((tuile1[case]), fill="green")
             cases_tirées_bot.extend([case])
+            bateaux_joueur.remove(case)
             check()
-            état = "jouer_joueur"
+            print(str(état))
+            if état != "victoire" or état != "défaite":
+                état = "jouer_joueur"
         else:
             can1.itemconfig((tuile1[case]), fill="pink")
+            cases_tirées_bot.extend([case])
+            état = "jouer_joueur"
     else:
         tirer_bot()
         
 def tirer_joueur(case):
-    global état,can2,tuile2
+    global état,can2,tuile2,cases_tirées_joueur,cases_occupées_bot, bateaux_bot
     if état == "jouer_joueur" and (case not in cases_tirées_joueur):
         if case in cases_occupées_bot:
             can2.itemconfig((tuile2[case]), fill="green")
             cases_tirées_joueur.extend([case])
+            bateaux_bot.remove(case)
             check()
-            état = "jouer_bot"
-            tirer_bot()
+            if état != "victoire" or état != "défaite":
+                état = "jouer_bot"
+                tirer_bot()
         else:
             can2.itemconfig((tuile2[case]), fill="pink")
+            cases_tirées_joueur.extend([case])
+            état = "jouer_bot"
+            tirer_bot()
     elif case in cases_tirées_joueur:
         label_info_desc.config(text="Veuillez tirer sur une case libre")
-
 def placement(case,impossible,position):
-    global cases_occupées_joueur,can1,tuile1,b,état
+    global cases_occupées_joueur,can1,tuile1,b,état,bateaux_joueur
     if b == 0:
         used=[]
         used.extend(cases_occupées_joueur)
@@ -128,16 +139,17 @@ def placement(case,impossible,position):
             cases_occupées_joueur.extend([case,(case+1)])
             can1.itemconfig((tuile1[case]), fill="black")
             can1.itemconfig((tuile1[case]+2), fill="black")
+            bateaux_joueur = cases_occupées_joueur
             état = "jouer_joueur"
         elif position == 1 and ((case) or (case+10)) not in used:
             cases_occupées_joueur.extend([case,(case+10)])
             can1.itemconfig((tuile1[case]), fill="black")
             can1.itemconfig((tuile1[case]+20), fill="black")
+            bateaux_joueur = cases_occupées_joueur
             état = "jouer_joueur"
 
 def gauche(event):
     global état,b
-    print ("Can1: ", str(event.x), str(event.y))
     if état == "placement_joueur":
         label_info_desc.config(text="Placement joueur")
         if b == 0:
@@ -163,11 +175,15 @@ def gauche(event):
     if état == "jouer_bot":
         label_info.config(text="Informations:")
         label_info_desc.config(text="Veuillez attendre que le bot joue")
-        tirer_bot()
+    if état == "terminé_victoire":
+        label_info.config(text="VOUS AVEZ GAGNE !")
+        label_info_desc.config(text="Veuillez relancer le projet pour rejouer !")
+    if état == "terminé_défaite":
+        label_info.config(text="VOUS AVEZ PERDU !")
+        label_info_desc.config(text="Veuillez relancer le projet pour rejouer !") 
         
 def droit(event):
     global état,b
-    print ("Can2: ", str(event.x), str(event.y))
     if état == "placement_joueur":
         label_info_desc.config(text="Placement joueur")
         if b == 0:
@@ -193,13 +209,19 @@ def droit(event):
     if état == "jouer_bot":
         label_info.config(text="Informations:")
         label_info_desc.config(text="Veuillez attendre que le bot joue")
+    if état == "victoire":
+        label_info.config(text="VOUS AVEZ GAGNE !")
+        label_info_desc.config(text="Veuillez relancer le projet pour rejouer !")
+    if état == "défaite":
+        label_info.config(text="VOUS AVEZ PERDU !")
+        label_info_desc.config(text="Veuillez relancer le projet pour rejouer !")    
         
 
 #-----------------------#
 # Début: Jeu            #
 #-----------------------#
 def jouer():
-    global état,can1,can2,tuile1,tuile2
+    global état,can1,can2,tuile1,tuile2,bateaux_bot
     #Suppression des éléments présent dans le menu d'accueil
     can_menu.config(width=0, heigh=0)
     jouer_button.destroy()
@@ -430,18 +452,7 @@ def jouer():
             else:
                 can2.itemconfig(tuile2[case], fill="black")
                 can2.itemconfig((tuile2[case]+20), fill="black")
-        """
-        #------------------------------#
-        # Début: Vérification bot      #
-        #------------------------------# 
-        if len(cases_occupées) != len(set(cases_occupées)):
-            for n in range(100):
-                can2.itemconfig(tuile2[n], fill="brown")
-            continue #Ne fonctionne pas comme on le souhaiterai, on reglera ce problème en cours demain
-        #------------------------------#
-        # Fin: Vérification bot        #
-        #------------------------------# 
-        """
+    bateaux_bot = cases_occupées_bot
     #------------------------------#
     # Fin: Placement du bot        #
     #------------------------------#
@@ -453,21 +464,6 @@ def jouer():
     état = "placement_joueur"
     label_info_desc.config(text="Veuillez placer le porte-avion (5 cases)")
     label_info.config(text="Clique gauche pour que le bateau soit horizontal et clique droit pour qu'il soit vertical")
-    """
-    label_info_desc.config(text="Placement joueur")
-    k=0
-    for k in range(0,5):
-        if k == 0:
-            label_info_desc.config(text="Veuillez placer le porte-avion (5 cases)")                    
-        if k == 1:
-            label_info_desc.config(text="Veuillez placer le croiseur (4 cases)")
-        if k == 2:
-            label_info_desc.config(text="Veuillez placer le contre-torpilleur (3 cases)")
-        if k == 3:
-            label_info_desc.config(text="Veuillez placer le sous-marin (3 cases)")
-        if k == 4:
-            label_info_desc.config(text="Veuillez placer le torpilleur (2 cases)")
-    """
     #------------------------------#
     # Fin: Placement joueur        #
     #------------------------------#
