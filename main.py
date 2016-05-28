@@ -3,6 +3,8 @@
 #-----------------------#
 from tkinter import *
 from random import randint
+import sys
+sys.setrecursionlimit(10000)
 #-----------------------#
 # Fin: Dépendances      #
 #-----------------------#
@@ -102,10 +104,7 @@ def placement(case,impossible,position): #Problème de superposition des navires
     """ Fonction qui permet au joueur de placer ses navires, l'argument 'case' est obtenu à partir de getCase() lorsque le joueur clique sur la plateforme, l'arg impossible sont les cases où le joueur ne peut pas cliquer, l'arg position peut être soit égal à 0 (horizontal) ou 1 (vertical) """
     global cases_occupées_joueur,can1,tuile1,b,état,bateaux_joueur
     if b == 0: #porte-avion (5 cases)
-        used=[]
-        used.extend(cases_occupées_joueur)
-        used.extend(impossible)
-        if position == 0 and ((case) or (case+1) or (case+2) or (case+3) or (case+4)) not in used:
+        if position == 0 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+1),(case+2),(case+3),(case+4))).intersection(set(cases_occupées_joueur))) == 0:
             cases_occupées_joueur.extend([case,(case+1),(case+2),(case+3),(case+4)])
             can1.itemconfig((tuile1[case]), fill="purple")
             can1.itemconfig((tuile1[case]+2), fill="purple")
@@ -113,7 +112,7 @@ def placement(case,impossible,position): #Problème de superposition des navires
             can1.itemconfig((tuile1[case]+6), fill="purple")
             can1.itemconfig((tuile1[case]+8), fill="purple")
             b=1 #pour passer au bateau suivant
-        elif position == 1 and ((case) or (case+10) or (case+20) or (case+30) or (case+40)) not in used:
+        elif position == 1 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+10),(case+20),(case+30),(case+40))).intersection(set(cases_occupées_joueur))) == 0:
             cases_occupées_joueur.extend([case,(case+10),(case+20),(case+30),(case+40)])
             can1.itemconfig((tuile1[case]), fill="purple")
             can1.itemconfig((tuile1[case]+20), fill="purple")
@@ -122,17 +121,14 @@ def placement(case,impossible,position): #Problème de superposition des navires
             can1.itemconfig((tuile1[case]+80), fill="purple")
             b=1 #pour passer au bateau suivant
     if b == 1: #croiseur (4 cases)
-        used=[]
-        used.extend(cases_occupées_joueur)
-        used.extend(impossible)
-        if position == 0 and ((case) or (case+1) or (case+2) or (case+3)) not in used:
+        if position == 0 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+1),(case+2),(case+3))).intersection(set(cases_occupées_joueur))) == 0:
             cases_occupées_joueur.extend([case,(case+1),(case+2),(case+3)])
             can1.itemconfig((tuile1[case]), fill="green")
             can1.itemconfig((tuile1[case]+2), fill="green")
             can1.itemconfig((tuile1[case]+4), fill="green")
             can1.itemconfig((tuile1[case]+6), fill="green")
             b=2
-        elif position == 1 and ((case) or (case+10) or (case+20) or (case+30)) not in used:
+        elif position == 1 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+10),(case+20),(case+30))).intersection(set(cases_occupées_joueur))) == 0:
             cases_occupées_joueur.extend([case,(case+10),(case+20),(case+30)])
             can1.itemconfig((tuile1[case]), fill="green")
             can1.itemconfig((tuile1[case]+20), fill="green")
@@ -140,40 +136,33 @@ def placement(case,impossible,position): #Problème de superposition des navires
             can1.itemconfig((tuile1[case]+60), fill="green")
             b=2
     if b == 2 or b == 3: #contre-torpilleur et sous-marin (3 cases chacun)
-        used=[]
-        used.extend(cases_occupées_joueur)
-        used.extend(impossible)
-        if position == 0 and ((case) or (case+1) or (case+2)) not in used:
+        if position == 0 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+1),(case+2))).intersection(set(cases_occupées_joueur))) == 0:
             cases_occupées_joueur.extend([case,(case+1),(case+2)])
             can1.itemconfig((tuile1[case]), fill="blue")
             can1.itemconfig((tuile1[case]+2), fill="blue")
             can1.itemconfig((tuile1[case]+4), fill="blue")
             b=b+1
-        elif position == 1 and ((case) or (case+10) or (case+20)) not in used:
+        elif position == 1 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+10),(case+20))).intersection(set(cases_occupées_joueur))) == 0:
             cases_occupées_joueur.extend([case,(case+10),(case+20)])
             can1.itemconfig((tuile1[case]), fill="blue")
             can1.itemconfig((tuile1[case]+20), fill="blue")
             can1.itemconfig((tuile1[case]+40), fill="blue")
             b=b+1
     if b == 4: #torpilleur(2 cases)
-        used=[]
-        used.extend(cases_occupées_joueur)
-        used.extend(impossible)
-        if position == 0 and ((case) or (case+1)) not in used:
+        if position == 0 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+1))).intersection(set(cases_occupées_joueur))) == 0:
             cases_occupées_joueur.extend([case,(case+1)])
             can1.itemconfig((tuile1[case]), fill="black")
             can1.itemconfig((tuile1[case]+2), fill="black")
             bateaux_joueur = cases_occupées_joueur
             état = "jouer_joueur"
-        elif position == 1 and ((case) or (case+10)) not in used:
+        elif position == 1 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+10))).intersection(set(cases_occupées_joueur))) == 0:
             cases_occupées_joueur.extend([case,(case+10)])
             can1.itemconfig((tuile1[case]), fill="black")
             can1.itemconfig((tuile1[case]+20), fill="black")
             bateaux_joueur = cases_occupées_joueur
             état="jouer_joueur"
-    
-    
-            
+            label_info.config(text="Informations:")
+            label_info_desc.config(text="A vous de tirer ...")
 
 def gauche(event):
     """ Fonction qui est appellée lorsque le joueur clique sur une plateforme avec un clique gauche, l'argument event contient les donnée par rapport au clique comme les positions """
@@ -190,19 +179,19 @@ def gauche(event):
         if b == 0:
             label_info_desc.config(text="Veuillez placer le porte-avion (5 cases)")
             impossible=[9,19,29,39,49,59,69,79,89,99,8,18,28,38,48,58,68,78,88,98,7,17,27,37,47,57,67,77,87,97,6,16,26,36,46,56,66,76,86,96]
-            (placement((getCase((event.x),(event.y))),impossible,0))
+            placement((getCase((event.x),(event.y))),impossible,0)
         if b == 1:
             label_info_desc.config(text="Veuillez placer le croiseur (4 cases)")
             impossible=[9,19,29,39,49,59,69,79,89,99,8,18,28,38,48,58,68,78,88,98,7,17,27,37,47,57,67,77,87,97]
-            (placement((getCase((event.x),(event.y))),impossible,0))
+            placement((getCase((event.x),(event.y))),impossible,0)
         if b == 2 or b == 3:
             label_info_desc.config(text="Veuillez placer le contre-torpilleur (3 cases)")
             impossible=[9,19,29,39,49,59,69,79,89,99,8,18,28,38,48,58,68,78,88,98]
-            (placement((getCase((event.x),(event.y))),impossible,0)) 
+            placement((getCase((event.x),(event.y))),impossible,0)
         if b == 4:
             label_info_desc.config(text="Veuillez placer le torpilleur (2 cases)")
             impossible=[9,19,29,39,49,59,69,79,89,99]
-            (placement((getCase((event.x),(event.y))),impossible,0))   
+            placement((getCase((event.x),(event.y))),impossible,0) 
     
         
 def droit(event):
@@ -220,81 +209,62 @@ def droit(event):
         if b == 0:
             label_info_desc.config(text="Veuillez placer le porte-avion (5 cases)")
             impossible=[90,91,92,93,94,95,95,96,97,98,99,80,81,82,83,84,85,86,87,88,89,70,71,72,73,74,75,76,77,78,79,60,61,62,63,64,65,66,67,68,69]
-            (placement((getCase((event.x),(event.y))),impossible,1))              
+            placement((getCase((event.x),(event.y))),impossible,1)             
         if b == 1:
             label_info_desc.config(text="Veuillez placer le croiseur (4 cases)")
             impossible=[90,91,92,93,94,95,95,96,97,98,99,80,81,82,83,84,85,86,87,88,89,70,71,72,73,74,75,76,77,78,79]
-            (placement((getCase((event.x),(event.y))),impossible,1)) 
+            placement((getCase((event.x),(event.y))),impossible,1) 
         if b == 2 or b == 3:
             label_info_desc.config(text="Veuillez placer le contre-torpilleur (3 cases)")
             impossible=[90,91,92,93,94,95,95,96,97,98,99,80,81,82,83,84,85,86,87,88,89]
-            (placement((getCase((event.x),(event.y))),impossible,1)) 
+            placement((getCase((event.x),(event.y))),impossible,1) 
         if b == 4:
             label_info_desc.config(text="Veuillez placer le torpilleur (2 cases)")
             impossible=[90,91,92,93,94,95,95,96,97,98,99]
-            (placement((getCase((event.x),(event.y))),impossible,1))
+            placement((getCase((event.x),(event.y))),impossible,1)
 
 def random(k,position,impossible):
-    """ Permet de générer des case où il n'y a pas encore de navires placé (problème: semble fonctionner que avec la première case) et qui soit possible (éviter que le bateau soit sur deux lignes), l'argument k correspond au navire en cours de placement """
+    """ Permet de générer des case où il n'y a pas encore de navires placé et qui soit possible (éviter que le bateau soit sur deux lignes), l'argument k correspond au navire en cours de placement """
     global cases_occupées_bot
-    if k == 0:
-        used=[]
-        used.extend(cases_occupées_bot)
-        used.extend(impossible)
-        if position == 0:
-            case = randint(0,95)
-            while ((case) or (case+1) or (case+2) or (case+3) or (case+4)) in used:
-                case = randint(0,95)
+    case = randint(0,99)
+    if k == 0: #porte-avion (5 cases)
+        if position == 0 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+1),(case+2),(case+3),(case+4))).intersection(set(cases_occupées_bot))) == 0:
             cases_occupées_bot.extend([case,(case+1),(case+2),(case+3),(case+4)])
-        else:
-            case = randint(0,59)
-            while ((case) or (case+10) or (case+20) or (case+30) or int(case+40)) in used:
-                case = randint(0,59)
+            return case
+        elif position == 1 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+10),(case+20),(case+30),(case+40))).intersection(set(cases_occupées_bot))) == 0:
             cases_occupées_bot.extend([case,(case+10),(case+20),(case+30),(case+40)])
-    if k == 1:
-        used=[]
-        used.extend(cases_occupées_bot)
-        used.extend(impossible)
-        if position == 0:
-            case = randint(0,96)
-            while ((case) or (case+1) or (case+2) or (case+3)) in used:
-                case = randint(0,96)
+            return case
+        else:
+            return random(k,position,impossible)
+    if k == 1: #croiseur (4 cases)
+        if position == 0 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+1),(case+2),(case+3))).intersection(set(cases_occupées_bot))) == 0:
             cases_occupées_bot.extend([case,(case+1),(case+2),(case+3)])
-        else:
-            case = randint(0,69)
-            while ((case) or (case+10) or (case+20) or (case+30)) in used:
-                case = randint(0,69)
+            case=int(case)
+            return case
+        elif position == 1 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+10),(case+20),(case+30))).intersection(set(cases_occupées_bot))) == 0:
             cases_occupées_bot.extend([case,(case+10),(case+20),(case+30)])
-    if k == 2 or k == 3:
-        used=[]
-        used.extend(cases_occupées_bot)
-        used.extend(impossible)
-        if position == 0:
-            case = randint(0,97)
-            while ((case) or (case+1) or (case+2)) in used:
-                case = randint(0,97)
+            return case
+        else:
+            return random(k,position,impossible)
+    if k == 2 or k == 3: #sous-marin et contre-torpilleur (3 cases)
+        if position == 0 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+1),(case+2))).intersection(set(cases_occupées_bot))) == 0:
             cases_occupées_bot.extend([case,(case+1),(case+2)])
-        else:
-            case = randint(0,79)
-            while ((case) or (case+10) or (case+20)) in used:
-                case = randint(0,79)
+            return case
+        elif position == 1 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+10),(case+20))).intersection(set(cases_occupées_bot))) == 0:
             cases_occupées_bot.extend([case,(case+10),(case+20)])
-    if k == 4:
-        used=[]
-        used.extend(cases_occupées_bot)
-        used.extend(impossible)
-        if position == 0:
-            case = randint(0,98)
-            while ((case) or (case+10)) in used:
-                case = randint(0,98)
-            cases_occupées_bot.extend([case,(case+1)])
+            return case
         else:
-            case = randint(0,89)
-            while ((case) or (case+10)) in used:
-                case = randint(0,89)
+            return random(k,position,impossible)
+    if k == 4: #torpilleur (2 cases)
+        if position == 0 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+1))).intersection(set(cases_occupées_bot))) == 0:
+            cases_occupées_bot.extend([case,(case+1)])
+            return case
+        elif position == 1 and len(set(((case),(case))).intersection(set(impossible))) == 0 and len(set(((case),(case+10))).intersection(set(cases_occupées_bot))) == 0:
             cases_occupées_bot.extend([case,(case+10)])
-    return case
-        
+            return case
+        else:
+            return random(k,position,impossible)
+            
 #-----------------------#
 # Fin:   Fonctions      #
 #-----------------------#
@@ -336,7 +306,6 @@ def jouer(): #def initiale permettant la créatoin de la fenêtre de jeu est l'i
         tuile1 = tuile1 + [can1.create_rectangle(x,y,x+d,y+d)]
         can1.itemconfig(tuile1[n])
         val1 = val1 + [can1.create_text(x+d//2, y+d//2)]
-        can1.itemconfig(val1[n], text = n)
 	
     ##Indication et placement des indications
     label1x = Label(fen,text="  A     B     C     D     E     F    G     H     I      J", font=("Helvetica", 18))
@@ -377,7 +346,6 @@ def jouer(): #def initiale permettant la créatoin de la fenêtre de jeu est l'i
         tuile2 = tuile2 + [can2.create_rectangle(x,y,x+d,y+d)]
         can2.itemconfig(tuile2[n])
         val2 = val2 + [can2.create_text(x+d//2, y+d//2)]
-        can2.itemconfig(val2[n], text = n)
 
     ##Indication et placement des indications
     label2x = Label(fen,text="  A     B     C     D     E     F    G     H     I      J", font=("Helvetica", 18))
@@ -415,7 +383,7 @@ def jouer(): #def initiale permettant la créatoin de la fenêtre de jeu est l'i
     état = "placement_bot"
     for k in range(0,5):
         if k == 0:
-            position=randint(0,1) #Position 0 = horizontal et position 1 = vertical
+            position=randint(0,1)
             if position == 0:
                 impossible=[9,19,29,39,49,59,69,79,89,99,8,18,28,38,48,58,68,78,88,98,7,17,27,37,47,57,67,77,87,97,6,16,26,36,46,56,66,76,86,96]
             else:
